@@ -22,15 +22,15 @@
 
 1.Склонируйте репозиторий:
    ```bash
-   git clone https://github.com/Krd2024/_instGaram_.gi
+git clone https://github.com/Krd2024/_instGaram_.gi
 ```
 2.Создание виртуального окружения
 ```bash
-   python -m venv .venv
+python -m venv .venv
 ```
 3.Активация виртуального окружения
 ```bash
-   .venv\Scripts\activate
+.venv\Scripts\activate
 ```
 4.Установка зависимостей проекта
 ```bash
@@ -48,5 +48,5 @@ SECRET_KEY = см. выше
 ```
 5.Запуск
 ```bash
-   python manage.py runserver
+python manage.py runserver
 ```
