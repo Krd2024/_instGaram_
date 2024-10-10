@@ -1,3 +1,4 @@
+from photo_app.forms import CommentForm, PhotoForm, PostForm
 from photo_app.serializers import PostSerializer, TagSerializer, UserSerializer
 from django.http import JsonResponse
 from django.contrib import messages
@@ -13,7 +14,7 @@ from rest_framework import generics
 from .serializers import CreateUserSerializer
 
 
-from photo_app.models import Comment, Post, Tag, User, CommentForm, PhotoForm, PostForm
+from photo_app.models import Comment, Post, Tag, User
 from photo_app.processor.postgre_data import (
     create_delete_like,
     delete_post_gallery,
