@@ -1,4 +1,4 @@
-from photo_app.models import Like, Notification, User
+from photo_app.models import User
 
 
 def cart_user(request):
@@ -21,9 +21,3 @@ def cart_user(request):
         return {"user_context": username, "notification": notification}
         # return {"user_context": username, "user_subscription": user_subscription}
     return {"x": 0}
-
-
-def count_like(request):
-    # count_like = Like.objects.all()
-    return {"count_like": 7777777}
-    # return {"count_like": count_like}

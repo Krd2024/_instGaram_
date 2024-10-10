@@ -1,9 +1,7 @@
-from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.hashers import make_password
-from datetime import datetime
 
 from photo_app.models import User
 
@@ -23,7 +21,8 @@ def login_view(request):
                     request, messages.INFO, "НЕПРАВИЛЬНОЕ ИМЯ ПОЛЬЗОВАТЕЛЯ ИЛИ ПАРОЛЬ"
                 )
                 return redirect("login")
-        except:
+        except Exception as e:
+            print(e)
             messages.add_message(request, messages.INFO, "ОШИБКА!")
             return redirect("login")
     return render(request, "register/login.html")
@@ -39,7 +38,8 @@ def register_view(request):
             user = User(username=username, password=password)
             user.save()
             return redirect("login")
-        except:
+        except Exception as e:
+            print(e)
             messages.add_message(request, messages.INFO, "ОШИБКА!")
             return redirect("register")
 

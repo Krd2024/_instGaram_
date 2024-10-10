@@ -1,9 +1,19 @@
+from photo_app.serializers import PostSerializer, TagSerializer, UserSerializer
+from django.http import JsonResponse
 from django.contrib import messages
-import json
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from collections import Counter
 
-from photo_app.models import Comment, Post, Tag, User
+from rest_framework import viewsets
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
+from rest_framework import status
+from rest_framework import generics
+from .serializers import CreateUserSerializer
+
+
+from photo_app.models import Comment, Post, Tag, User, CommentForm, PhotoForm, PostForm
 from photo_app.processor.postgre_data import (
     create_delete_like,
     delete_post_gallery,
@@ -17,8 +27,6 @@ from photo_app.processor.postgre_data import (
     notification_is_read,
     subscription_create,
 )
-from photo_app.serializers import PostSerializer, TagSerializer, UserSerializer
-from collections import Counter
 
 
 def index(request):
@@ -49,10 +57,6 @@ def user_profile(request, username, notification=False):
         "other/profile.html",
         {"user": user, "subscriber": subscriber},
     )
-
-
-from django.shortcuts import render, redirect
-from .forms import CommentForm, PhotoForm, PostForm
 
 
 # @login_required
@@ -98,18 +102,13 @@ def upload_photo_gallery(request):
     return render(request, "other/upload_gallery.html", {"form": form})
 
 
-import threading
-
-
 def like_counter(request, post_id):
     """Счётчик лайков"""
 
-    # print("like < ----- ")
     if not request.user.is_authenticated:
         return JsonResponse({"success": 0, "answer": 0})
 
     if request.method == "POST":
-
         count_like = create_delete_like(request.user, post_id)
     return JsonResponse({"success": 1, "answer": count_like})
 
@@ -202,12 +201,9 @@ def all_posts_in_tag(request, tag_name):
     return render(request, "other/all_posts_tag.html", {"all_posts": context})
 
 
-def all_tags_in_post(request, post_id):
-    post = Post.objects.get(id=post_id)
-    tags_for_post = post.tags.all()
-
-
-from django.views.decorators.cache import cache_page
+# def all_tags_in_post(request, post_id):
+#     post = Post.objects.get(id=post_id)
+#     tags_for_post = post.tags.all()
 
 
 # @cache_page(600, cache="default", key_prefix="")
@@ -255,7 +251,6 @@ def notification(request):
     return render(request, "other/notification.html", context)
 
 
-# -----------------------------------------------------------------------------------------
 #             ---------------------- api -----------------------------------
 
 """
@@ -276,15 +271,6 @@ partial_update(): Обрабатывает PATCH-запросы на /tags/<id>/
 destroy(): Обрабатывает DELETE-запросы на /tags/<id>/, удаляет объект.
 
 """
-from rest_framework import viewsets
-import redis
-from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.views import APIView
-from rest_framework import status
-from rest_framework import generics
-from .models import User
-from .serializers import CreateUserSerializer
 
 
 # ----------------------------------------------------------------
@@ -294,10 +280,6 @@ class UserApiView(viewsets.ModelViewSet):
     http_method_names = ["get"]
 
 
-# -------------------------------------------------------------------------------------
-
-
-# class UserApiView(viewsets.ModelViewSet):
 class TagsApiView(viewsets.ReadOnlyModelViewSet):
 
     queryset = Tag.objects.all()
@@ -352,77 +334,7 @@ class PostListView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# ------------------------------------------------------------------------------------------------
-
-
 class CreateUserView(generics.CreateAPIView):
     # queryset = User.objects.all()
     serializer_class = CreateUserSerializer
     permission_classes = [AllowAny]
-
-
-"""
-urlpatterns = [
-path('posts/', PostListView.as_view()),
-]
-
-"""
-
-# ------------------------------------------------------------------------------------------------
-
-
-red = redis.Redis(host="localhost", port=6379, db=0)
-
-# def list(self, request, *args, **kwargs):
-#     # Вывод параметров запроса
-#     print("----------------------------------------------------")
-#     print(
-#         request.content_type,
-#         "<< - возвращает объект string, представляющий тип носителя в теле HTTP-запроса, или пустую строку, если тип носителя не был указан.",
-#     )
-#     print("----------------------------------------------------")
-#     print(
-#         request.query_params, "<< - Печать параметров запроса "
-#     )  # Печать параметров запроса
-#     print("----------------------------------------------------")
-#     print(
-#         request.auth,
-#         "<<< --- возвращает любой дополнительный контекст аутентификации",
-#     )
-#     # Получение данных для ответа
-#     response = super().list(request, *args, **kwargs)
-
-#     # Печать данных запроса (не будет содержать тела запроса в GET запросах)
-#     print("----------------------------------------------------")
-#     print(
-#         request.data, "<< -- Для GET запросов request.data будет пустым"
-#     )  # Для GET запросов request.data будет пустым
-#     print("----------------------------------------------------")
-#     print(
-#         request.stream,
-#         "<< - возвращает поток, представляющий содержимое тела запроса.",
-#         print("----------------------------------------------------"),
-#     )
-#     # print(request.session.get("user_id", "Не найдено"))
-# for key, value in request.META.items():
-#     print(key, ": ", value)
-
-# return response
-
-# ============== запрос post ================================
-
-import requests
-
-
-def post():
-    url = "http://example.com/api/posts/"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": "Bearer <your_token_here>",  # Уберите эту строку, если аутентификация не требуется
-    }
-    data = {"author": "JohnDoe", "caption": "This is a new post."}
-
-    response = requests.post(url, json=data, headers=headers)
-
-    print(response.status_code)  # HTTP статус код
-    print(response.json())  # Ответ от сервера в формате JSON

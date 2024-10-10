@@ -15,13 +15,6 @@ class TagSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-# class UserSerializer(serializers.HyperlinkedModelSerializer):
-#     class Meta:
-#         model = Tag
-#         fields = "__all__"
-# serializers.py
-
-
 class PostSerializer(serializers.ModelSerializer):
 
     class Meta:

@@ -9,4 +9,4 @@ class PhotoAppConfig(AppConfig):
 
     def ready(self):
 
-        import photo_app.signals
+        import photo_app.signals  # noqa

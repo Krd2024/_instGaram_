@@ -1,4 +1,4 @@
-from django.db.models.signals import pre_save, post_save, post_delete
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.core.cache import cache
 
@@ -10,6 +10,11 @@ from .models import Post, User
 
 
 def clear_authors_count_cache():
+    """Очистить кеш при создании,
+    удалении поста,при регистрации
+    нового пользователя
+    """
+
     cache.delete("all_users")
 
 
@@ -32,35 +37,7 @@ def pre_save_user_post(sender, instance, created, **kwargs):
 
 
 @receiver(post_delete, sender=Post)
-def pre_save_user(sender, instance, **kwargs):
+def pre_delete_post(sender, instance, **kwargs):
     notification_in_signal_delete(instance)
     clear_authors_count_cache()
     print("ПОСТ УДАЛЁН")
-
-
-# @receiver(post_delete, sender=User)
-# def pre_save_user(sender, instance, **kwargs):
-#     clear_authors_count_cache()
-#     print("УДАЛЁН")
-
-
-# print(instance.caption, "<<<<< ------- signals")
-# if instance.caption != "" and instance.caption is not None:
-#     print(instance.caption, "<<<<< ------- signals")
-#     text = instance.caption.split()
-#     tags = [t.replace("#", "") for t in text if t.startswith("#")]
-#     print(tags)
-#     tegs_for_post = [Tag(name=tag) for tag in tags]
-
-# Tag.objects.bulk_create(tegs_for_post)
-
-
-#     post.tags.add(tag1, tag2)
-
-
-# instance.caption = " | ".join(text)
-# ----------------------------------------------------------------
-# @receiver(pre_save, sender=User)
-# def pre_save_user(sender, instance, **kwargs):
-#     if kwargs["created"]:
-#         print("НОВЫЙ")

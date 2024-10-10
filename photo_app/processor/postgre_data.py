@@ -1,41 +1,26 @@
-import json
-from django.db import IntegrityError
 from django.http import Http404, HttpResponse
+from django.db import IntegrityError
 
+import redis
+from django.conf import settings
+from django.core.cache import cache
+
+from photo_app.models import Like, Notification, Post, Subscription, Tag, User
 from photo_app.redis_cache.redis_users import get_user_all_redis, get_user_profile_redis
-from ..models import *
-from django.shortcuts import get_object_or_404
 
 
 def get_main():
+    """Главная страница"""
 
     users = get_user_all_redis()  # получить из редиса
-
     return users
 
 
 def get_user_profile(request, username):
     """Вернуть объект выбранного пользователя"""
-    # user = User.objects.filter(username=username)
-    # subscriber = user[0].is_subscriber_of(request.user)
-    # return user, subscriber
 
     return get_user_profile_redis(request, username)  # получить из редиса
 
-
-# ----------------------------------------------------------------
-
-import threading
-import queue
-
-# ----------------------------------------------------------------
-import redis
-from django.conf import settings
-from django.core.cache import cache
-
-from photo_app.models import User
-
-#                           --------
 
 redis_instance = redis.Redis(
     host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB
@@ -55,14 +40,12 @@ def create_delete_like(user, post_id):
 
         if created:
             print("Like успешно добавлено")
-            # cache.set("choice_user", {"subscriber": True})
 
             count_like = Like.objects.filter(post=post).count()
             return count_like
         else:
             print("Like удалён")
             like.delete()
-
             count_like = Like.objects.filter(post=post).count()
             # queue.put(count_like)
             return count_like
@@ -72,7 +55,6 @@ def create_delete_like(user, post_id):
     return HttpResponse(1)
 
 
-# ----------------------------------------------------------------
 def subscription_create(request_user, user):
     """Подписаться или отменить подписку"""
 
@@ -82,7 +64,6 @@ def subscription_create(request_user, user):
 
     subscriber = User.objects.get(username=request_user)
     subscribed_to = User.objects.get(username=user)
-
     subscription, created = Subscription.objects.get_or_create(
         subscriber=subscriber, subscribed_to=subscribed_to
     )
@@ -110,7 +91,6 @@ def get_subscribed_to(user):
     """Подписчики request.user"""
 
     user = User.objects.get(username=user.username)
-    # print(user)
     return user.subscri_to_set.all()
 
 
@@ -118,7 +98,6 @@ def get_subscriber(user):
     """Подписки request.user"""
 
     user = User.objects.get(username=user.username)
-    # print(user)
     return user.subscri_set.all()
 
 
@@ -127,43 +106,16 @@ def get_all_posts_in_tag(tag_name):
     # cache.delete("get_all_posts_in_tag")
     try:
         all_tags = cache.get(tag_name)
-
         if all_tags[0] != tag_name:
-
             all_tags = Tag.objects.filter(name=tag_name)
-
             cache.set(tag_name, all_tags)
             print(all_tags[0], "<<<<<< --------------- tag_name из sql ")
-
         print(all_tags, "<<<<<< --------------- tag_name из редис")
     except Exception as e:
-
+        print(e)
         all_tags = Tag.objects.filter(name=tag_name)
         cache.set(tag_name, all_tags)
     return all_tags
-    # return Tag.objects.filter(name=tag_name)
-
-
-# <QuerySet [<Tag: природа>, <Tag: природа>]>
-
-# Получаем пост
-"post = get_object_or_404(Post, id=post_id)"
-
-# Получаем всех пользователей, которые лайкнули пост
-"liked_users = User.objects.filter(likes__post=post)"
-
-# Проверяем, есть ли уже лайк от этого пользователя на этот пост
-"""
-try:
-    like, created = Like.objects.get_or_create(post=post, user=user)
-    if created:
-        print("Like added successfully")
-    else:
-        print("User has already liked this post")
-except IntegrityError:
-    print("An error occurred while trying to create the like")
-
-"""
 
 
 def get_user_friends(subscribed_to_, subscribed):
@@ -171,15 +123,10 @@ def get_user_friends(subscribed_to_, subscribed):
 
     subscribed_to = [subsc.subscriber for subsc in subscribed_to_]
     subscriber = [subsc.subscribed_to for subsc in subscribed]
-    print(subscribed_to, subscriber)
-
     subscribers_set = set(subscribed_to)
     subscribed_set = set(subscriber)
-
-    frands = subscribers_set.intersection(subscribed_set)
-    print(frands, "<<<<<<<<<< --- frands")
-
-    return frands
+    friends = subscribers_set.intersection(subscribed_set)
+    return friends
 
 
 def delete_post_gallery(post_id):
@@ -194,6 +141,7 @@ def delete_post_gallery(post_id):
 # instance из сигнала
 def notification_in_signal(instance):
     """Создать уведомления для подписчиков о новом посте"""
+
     try:
         author_post = instance.author
         print(author_post, "< ----- author")
@@ -209,7 +157,7 @@ def notification_in_signal(instance):
                 sender=user,  # пользователь, на которого подписаны
                 recipient=subscriber.subscriber,  # Получатель - подписчик
                 notification_type="new_post",
-                related_object_id=instance.id,  #  ID связанного объекта
+                related_object_id=instance.id,  # ID связанного объекта
             )
             notifications.append(notification)
 
@@ -248,12 +196,11 @@ def notification_in_signal_delete(instance):
 
 
 def notification_is_read(request, username):
+    """Отметить прочитанным уведомления"""
+
     print(f"Удалить увед. для {request.user} от {username}")
     user_obj = User.objects.get(username=username)
     update = Notification.objects.filter(
         sender=user_obj, recipient=request.user
     ).update(is_read=True)
     print(f"Отметить прочитанным: {update} уведомления")
-    # for up_date in update:
-    #     up_date.is_read = True
-    #     up_date.save()

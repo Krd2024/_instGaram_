@@ -10,37 +10,20 @@ redis_instance = redis.Redis(
 )
 
 
-from django.views.decorators.cache import cache_page
-
-
-# @cache_page(60 * 15)
 def get_user_all_redis(user_id=None):
     """Получить всех из редис"""
 
     # cache.delete("all_users")
-    users = cache.get(f"all_users")
+    users = cache.get("all_users")
     print(users, "< ------------------- users из redis")
-
     if users is None:
         # users = User.objects.all() <<< --- 800 ms + 63 запроса SQL(30ms)
         users = User.objects.prefetch_related(
             "post_set__like_set"
         ).all()  # <<< --- 200 ms + 4 SQL запроса(3.5ms)
 
-        print(users, "< ------------------- sqlite")
-        cache.set(f"all_users", users, timeout=300)
-        # user = User.objects.get(id=user_id)
-
-        # profile = {
-        #     "email": user.email,
-        #     "phone_number": user.phone_number,
-        #     "sity": user.sity,
-        #     "profile_picture": user.profile_picture.url,
-        #     "on_the_list": user.on_the_list,
-        # }
-
-        # cache.set(f"user_profile_{user_id}", profile, timeout=300)
-
+        print(users, "< -------------------  users из sqlite")
+        cache.set("all_users", users, timeout=300)
     return users
 
 
