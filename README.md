@@ -34,7 +34,7 @@ python -m venv .venv
 ```
 4.Установка зависимостей проекта
 ```bash
-   pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 **Сгенерировать SECRET_KEY в Django**
 ```python
