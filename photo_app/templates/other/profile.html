@@ -58,16 +58,6 @@
     <span class="close">&times;</span>
     <img class="modal-content" id="img01" />
     <div id="caption"></div>
-    {% comment %} <div id="comment"></div>
-    <div class="container_comment">
-      <div class="comment_div">
-        {% for data in user %}
-          {% for post in data.post_set.all %}
-            {% for comment in post.comments.all %}
-              <div class="comment_text">{{ comment.text }}</div>
-            {% endfor %}
-          {% endfor %}
-        {% endfor %} {% endcomment %}
 
         <hr style="color: white;" />
         {% comment %} <span style="color: white;">Комментарии</span> {% endcomment %}
