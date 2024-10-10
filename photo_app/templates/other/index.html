@@ -1,0 +1,162 @@
+{% extends 'other/main.html' %}
+{% block content %}
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  <div class="index_html">
+    <div class="user-container">
+      <div class="wiget_user">
+        {% for user in users %}
+          <div class="user-card">
+            {% if user.profile_picture %}
+              <div>
+                <a href="{% url 'user_profile' user.username False %}"><img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="user-photo" /></a>
+              </div>
+            {% else %}
+              <div>
+                <a href="{% url 'user_profile' user.username %}"><div class="user-photo-placeholder">{{ user.username|slice:':1' }}</div></a>
+              </div>
+            {% endif %}
+            <p class="user-name">{{ user.username }}</p>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="gallery-item">
+        {% for user in users %}
+          {% for post in user.post_set.all %}
+            {% if post.image.url %}
+              <div class="photo_gallery">
+                <a href="{% url 'user_profile' user.username %}"><img src="{{ post.image.url }}" alt="" class="gallery-image" loading="lazy" /></a>
+                <div class="action-checkbox">
+                  <button id="rection" onclick="increaseCounter({{ post.id }})"><span class="counter" id="counter-{{ post.id }}">👍{{ post.like_set.count }}</span></button>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <script>
+    async function increaseCounter(answerId) {
+      console.log(answerId, '< - ID')
+      const response = await fetch(`/like_counter/${answerId}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({})
+      })
+      const data = await response.json()
+      console.log(data.answer, '< - answer')
+    
+      if (data.success) {
+        document.getElementById(`counter-${answerId}`).innerText = '👍' + data.answer
+      } else {
+        window.location.href = 'register'
+        console.error('Failed to increase counter')
+      }
+    }
+  </script>
+  <style>
+    #rection {
+      /* visibility: hidden;*/
+      width: fit-content;
+      font-size: 12px;
+      padding: 0;
+      color: red;
+      position: absolute;
+      opacity: 0.7;
+    
+      transform: translate(0px, -20px);
+    }
+    .counter {
+      display: inline-block;
+    }
+    .photo_gallery {
+      margin: 1px;
+    }
+    .wiget_user {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .gallery-item {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      line-height: 0;
+    }
+    a {
+      text-decoration: none;
+    }
+    .user-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+    }
+    
+    .user-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100px; /* Adjust size as needed */
+    }
+    
+    .user-photo {
+      width: 80px; /* Adjust size as needed */
+      height: 80px; /* Adjust size as needed */
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #ddd; /* Optional: border around the photo */
+    }
+    
+    .user-photo-placeholder {
+      width: 80px; /* Adjust size as needed */
+      height: 80px; /* Adjust size as needed */
+      border-radius: 50%;
+      background-color: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 40px; /* Adjust size as needed */
+      font-weight: bold;
+    }
+    
+    .user-name {
+      margin-top: 8px;
+      font-size: 16px;
+    }
+    .gallery-image {
+      width: 200px;
+      height: 150px;
+      max-width: 200px;
+      transition: opacity 0.3s ease;
+    }
+    .gallery-image:hover {
+      opacity: 0.6; /* Уменьшает непрозрачность до 60% при наведении */
+    }
+    @media (min-width: 600px) and (max-width: 1024px) {
+      .gallery-image {
+        max-width: 150px; /* Устанавливает максимальную ширину изображения для планшетов */
+      }
+    }
+    
+    /* Стили для изображений на мобильных устройствах */
+    @media (max-width: 599px) {
+      .gallery-image {
+        max-width: 15vh; /* Устанавливает максимальную ширину изображения для мобильных устройств */
+      }
+    }
+  </style>
+{% endblock %}

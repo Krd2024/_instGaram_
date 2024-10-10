@@ -1,0 +1,49 @@
+{% extends 'other/main.html' %}
+{% block content %}
+  <h1>{{ post.title }}</h1>
+  <p>{{ post.content }}</p>
+
+  <h2>Комментарии</h2>
+  {% if comments %}
+    <div id="comments">
+      {% for comment in comments %}
+        <div class="comment">
+          <div class="author">{{ comment.author.username }}</div>
+          <div class="created_at">{{ comment.created_at }}</div>
+          <div class="text">{{ comment.text }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>Комментариев нет.</p>
+  {% endif %}
+  {% if request.user != post.author %}
+    <div class="form">
+      <form method="POST" action="">
+        {% csrf_token %}
+        <textarea name="comment" id="comment_text" rows="5" placeholder="Отзыв">ЗдОрово</textarea>
+        <input type="submit" value="Отправить" class="button_form" />
+      </form>
+    </div>
+  {% endif %}
+  <style>
+    .comment {
+      border-bottom: 1px solid #ddd;
+      padding: 10px 0;
+    }
+    .comment .author {
+      font-weight: bold;
+    }
+    .comment .created_at {
+      color: #888;
+      font-size: 0.9em;
+    }
+    .comment .text {
+      margin-top: 5px;
+    }
+    .button_form {
+      position: absolute;
+      transform: translate(0px, 110px);
+    }
+  </style>
+{% endblock %}

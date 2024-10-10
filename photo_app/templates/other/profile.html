@@ -1,0 +1,427 @@
+{% extends 'other/main.html' %}
+{% block content %}
+  {% comment %} {% load cache %} {% endcomment %}
+  {% load static %}
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li class="{{ message.tags }}">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+  <hr />
+  <div>
+    <div class="container_profile">
+      <p class="p_subscription">
+        {% comment %} <img src="{{ user.first.profile_picture.url }}" alt="photo" class="profile-image" /> {% endcomment %}
+        {% if request.user.is_authenticated %}
+          {% if subscriber %}
+            <button id="subscriber" onclick="increaseSubscription('{{ user.first.username }}')"><span id="subscription">👍 Вы подписаны{{ post.like_set.count }}</span></button>
+          {% else %}
+            <button id="subscriber" onclick="increaseSubscription('{{ user.first.username }}')"><span id="subscription">Подписаться{{ post.like_set.count }}</span></button>
+          {% endif %}
+        {% endif %}
+      </p>
+      <span><h1>Постов {{ user.first.post_set.all.count }}</h1></span>
+      <h1>Пользователь {{ user.first.username }}</h1>
+      {% if user.first.profile_picture %}
+        <div>
+          <img src="{{ user.first.profile_picture.url }}" alt="photo" class="profile-image" />
+        </div>
+      {% else %}
+        <div>
+          <img src="{% static 'head.jpg' %}" alt="photo" class="profile-image" />
+        </div>
+      {% endif %}
+    </div>
+  </div>
+  <hr />
+  {% comment %} {% cache 500 user %} {% endcomment %}
+  <div class="gallery-item">
+    {% for data in user %}
+      {% for post in data.post_set.all %}
+        {% if post.image %}
+          <div class="photo_gallery">
+            <a href="{% url 'add_comment' post.id %} " class="comment_button"><button>Коментарий</button></a>
+            {% if post.author == request.user %}
+              <a href="{% url 'delete_gallery_post' post.id %} " class="delete_button"><button>🗑️</button></a>
+            {% endif %}
+            <a href="#" class="gallery-link" data-img="{{ post.image.url }}" data-caption="{{ post.caption }}" data-id="{{ post.id }}"><img src="{{ post.image.url }}" alt="{{ post.caption }}" class="gallery-image" /></a>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  </div>
+
+  <!-- Модальное окно -->
+  <div id="myModal" class="modal">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="img01" />
+    <div id="caption"></div>
+    {% comment %} <div id="comment"></div>
+    <div class="container_comment">
+      <div class="comment_div">
+        {% for data in user %}
+          {% for post in data.post_set.all %}
+            {% for comment in post.comments.all %}
+              <div class="comment_text">{{ comment.text }}</div>
+            {% endfor %}
+          {% endfor %}
+        {% endfor %} {% endcomment %}
+
+        <hr style="color: white;" />
+        {% comment %} <span style="color: white;">Комментарии</span> {% endcomment %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ========================== Подписаться,отписаться ======================================= */
+    async function increaseSubscription(username) {
+      console.log('Username:', username)
+      const response = await fetch(`/subscription/${username}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({})
+      })
+      const data = await response.json()
+      console.log(data.answer, ' <- answer')
+    
+      if (data.success) {
+        document.getElementById(`subscription`).innerText = '👍 ' + data.answer
+      } else {
+        //window.location.href = 'register'
+        document.getElementById(`subscription`).innerText = data.answer
+        //console.error('Failed to subscription')
+      }
+    }
+  </script>
+
+  <style>
+    .comment_button button {
+      font-size: 10px;
+      opacity: 0.7;
+    }
+    .delete_button button {
+      font-size: 10px;
+      opacity: 0.7;
+    }
+    
+    .comment_button {
+      position: absolute;
+      transform: translate(0px, 0px);
+      z-index: 1000;
+    }
+    .delete_button {
+      position: absolute;
+      transform: translate(0px, 132px);
+      z-index: 1000;
+    }
+    .container_comment {
+      display: flex;
+      justify-content: center;
+    }
+    .comment_div {
+      padding: 20px;
+      text-align: center;
+      white-space: pre-wrap;
+      width: 80vw;
+      background-color: black;
+      opacity: 0.7;
+    }
+    .comment {
+      color: white;
+      font-size: 20px;
+      margin-left: 20px;
+    }
+    .container_profile img {
+      width: 10vw;
+      height: 10vw;
+    }
+    .container_profile {
+      display: flex;
+      flex-direction: row-reverse;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 80vw;
+      height: 70px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #333;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #555;
+      font-size: 18px;
+      margin: 10px 0;
+    }
+    .user-info {
+      padding: 10px;
+      margin-bottom: 20px;
+    }
+    .user-info p {
+      margin: 0;
+      padding: 5px 0;
+    }
+    .user-info span {
+      font-weight: bold;
+    }
+    #subscriber {
+      height: 30px;
+    
+      width: 140px;
+      background-color: #007bff;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      font-size: 12px;
+      padding: 5px 10px;
+      cursor: pointer; /* Указатель курсора при наведении */
+      transition: background-color 0.3s; /* Плавный переход цвета фона */
+    }
+    
+    #subscriber:hover {
+      background-color: #0056b3;
+    }
+    
+    #subscription {
+      font-weight: bold;
+    }
+    .profile-image {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover; /* Обеспечивает, что изображение полностью покрывает область */
+    }
+    
+    /* Стили для модального окна */
+    .modal {
+      display: none; /* Скрыто по умолчанию */
+      position: fixed; /* Оставляет модальное окно на месте */
+      z-index: 1000; /* Поверх всего остального контента */
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto; /* Добавляет прокрутку, если необходимо */
+      background-color: rgba(0, 0, 0, 0.8); /* Полупрозрачный черный фон */
+    }
+    
+    /* Стили для контента модального окна */
+    .modal-content {
+      margin: 25px auto;
+      display: block;
+      width: 80%;
+      max-width: 600px;
+    }
+    .comment_text {
+      display: none;
+    }
+    /* Стили для текста под изображением */
+    #caption,
+    #comment {
+      margin: 15px auto;
+      text-align: center;
+      color: #f1f1f1;
+      font-size: 18px;
+    }
+    
+    /* Стили для кнопки закрытия */
+    .close {
+      position: absolute;
+      top: 15px;
+      right: 35px;
+      color: #f1f1f1;
+      font-size: 40px;
+      font-weight: bold;
+    }
+    
+    .close:hover,
+    .close:focus {
+      color: #bbb;
+      text-decoration: none;
+      cursor: pointer;
+    }
+    
+    /* -------------------------------------------------------------- */
+    .photo_gallery {
+      margin: 1px;
+    }
+    .wiget_user {
+      display: flex;
+    }
+    .gallery-item {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      line-height: 0;
+    }
+    /* Основные стили для изображений в галерее */
+    .gallery-image {
+      width: 200px; /* Делает изображение шириной 100% от родительского контейнера */
+      height: 150px; /* Высота устанавливается автоматически для сохранения пропорций */
+      max-width: 200px; /* Устанавливает максимальную ширину изображения */
+      transition: opacity 0.3s ease; /* Плавное изменение прозрачности */
+    }
+    .gallery-image:hover {
+      opacity: 0.6; /* Уменьшает непрозрачность до 60% при наведении */
+    }
+    
+    /* Стили для изображений на планшетах */
+    @media (min-width: 600px) and (max-width: 1024px) {
+      .comment {
+        font-size: 25px;
+      }
+      .gallery-image {
+        max-width: 150px; /* Устанавливает максимальную ширину изображения для планшетов */
+      }
+    }
+    
+    /* Стили для изображений на мобильных устройствах */
+    @media (max-width: 599px) {
+      .comment {
+        font-size: 28px;
+      }
+      .container_profile {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: center;
+      }
+      .gallery-image {
+        max-width: 15vh; /* Устанавливает максимальную ширину изображения для мобильных устройств */
+      }
+    }
+    
+    a {
+      text-decoration: none;
+    }
+    .user-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+    }
+    
+    .user-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100px; /* Adjust size as needed */
+    }
+    
+    .user-photo {
+      width: 80px; /* Adjust size as needed */
+      height: 80px; /* Adjust size as needed */
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #ddd; /* Optional: border around the photo */
+    }
+    
+    .user-photo-placeholder {
+      width: 80px; /* Adjust size as needed */
+      height: 80px; /* Adjust size as needed */
+      border-radius: 50%;
+      background-color: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #red;
+      font-size: 40px; /* Adjust size as needed */
+      font-weight: bold;
+    }
+    
+    .user-name {
+      margin-top: 8px;
+      font-size: 16px;
+    }
+  </style>
+  <script>
+    //document.addEventListener('DOMContentLoaded', function () {
+    // Получаем все элементы с классом comment-text
+    //var commentElements = document.querySelectorAll('.comment-text')
+    
+    // Массив для хранения текста комментариев
+    //var commentTextAll = Array.from(commentElements).map(function (element) {
+    //return element.textContent.trim() // Удаляем лишние пробелы
+    //})
+    //console.log(commentTextAll)
+    //})
+    // Получаем модальное окно
+    var modal = document.getElementById('myModal')
+    
+    // Получаем изображение модального окна
+    var modalImg = document.getElementById('img01')
+    
+    // Получаем текст под изображением модального окна
+    var captionText = document.getElementById('caption')
+    
+    var commentText = document.getElementById('comment')
+    
+    // Получаем все ссылки в галерее
+    var galleryLinks = document.querySelectorAll('.gallery-link')
+    
+    var commentElements = document.querySelectorAll('.comment_text')
+    var commentTextAll = Array.from(commentElements).map(function (element) {
+      return element.textContent
+    })
+    
+    //console.log(commentElements)
+    console.log(commentTextAll, '< - commentAll')
+    
+    // Для каждой ссылки добавляем обработчик события клика
+    galleryLinks.forEach(function (link) {
+      link.addEventListener('click', function (event) {
+        event.preventDefault() // Отменяем стандартное поведение ссылки
+    
+        // Получаем URL изображения и подпись
+        var imgSrc = link.getAttribute('data-img')
+        var imgCaption = link.getAttribute('data-caption')
+        //var postComment = link.getAttribute('data-comment')
+        //console.log(postComment, '<< -- data-comment')
+    
+        // Устанавливаем значения в модальном окне
+        modal.style.display = 'block'
+        modalImg.src = imgSrc
+        captionText.textContent = imgCaption
+        //commentText.textContent = commentElements
+    
+        commentElements.forEach(function (element) {
+          commentTextAll.push(element.textContent.trim())
+        })
+    
+        console.log(commentTextAll)
+    
+        var outputElement = document.createElement('div')
+        commentText.innerHTML = '<h3>Комментарии:</h3><ul>' + commentTextAll.map((text) => '<li>' + text + '</li>').join('') + '</ul>'
+        document.body.appendChild(outputElement)
+      })
+    })
+    
+    // Получаем кнопку закрытия
+    var span = document.getElementsByClassName('close')[0]
+    
+    // При клике на кнопку закрытия, закрываем модальное окно
+    span.onclick = function () {
+      modal.style.display = 'none'
+    }
+    
+    // Закрываем модальное окно при клике вне его
+    window.onclick = function (event) {
+      if (event.target == modal) {
+        modal.style.display = 'none'
+      }
+    }
+  </script>
+  {% comment %} {% endcache %} {% endcomment %}
+{% endblock %}

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="header">
+      {% include 'other/header.html' %}
+    </div>
+
+    <div class="wiget_main">
+      <a href="{% url 'index' %}">Главная</a>
+      {% if request.user.is_authenticated %}
+        <a href="{% url 'logoutPage' %}">Выход</a>
+        <div class="user-card-menu">
+          <div>
+            <div class="user-card">
+              {% include 'other/cart_user.html' %}
+            </div>
+          </div>
+          <div>
+            <form method="get" action="{% url 'all_posts_in_tag' 'tag_name' %}">
+              <label for="tags">Теги:</label>
+              <select id="tags" name="tag">
+                {% for tag in tags %}
+                  <option value="{{ tag.name }}">{{ tag.name }}</option>
+                {% endfor %}
+              </select>
+              <button type="submit">Поиск</button>
+            </form>
+
+            <div class="main_photos">
+              <input type="text" id="tagInput" placeholder="Введите тег" />
+              <a href="#" id="searchLink">Поиск</a>
+            </div>
+
+            <div class="main_photos">
+              <div class="profile_photo">
+                <a href="{% url 'upload_photo' %}">Фото профиля</a>
+              </div>
+              <div class="profile_photo">
+                <a href="{% url 'upload_gallery' %}">Добавить фото</a>
+              </div>
+              <div class="profile_photo">
+                <a href="{% url 'subscriber' %}">Подписки</a>
+              </div>
+              <div class="profile_photo">
+                <a href="{% url 'subscribed_to' %}">Подписчики</a>
+              </div>
+              <div class="profile_photo">
+                <a href="{% url 'frands' %}">Друзья</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <a href="{% url 'login' %}">Вход</a>
+        <a href="{% url 'register' %}">Регистрация</a>
+      {% endif %}
+    </div>
+    <hr />
+    <div>
+      <div></div>
+      <div>
+        <div></div>
+      </div>
+      {% comment %} <div>
+        {% include 'other/cart_user.html' %}
+      </div> {% endcomment %}
+    </div>
+
+    {% block content %}
+
+    {% endblock %}
+  </body>
+  <script>
+    document.getElementById('searchLink').addEventListener('click', function (event) {
+      event.preventDefault() // Предотвращаем стандартное поведение ссылки
+    
+      var input = document.getElementById('tagInput').value
+      if (input == '') {
+        input.placeholder = 'Так нельзя'
+      } else {
+        var url = "{% url 'all_posts_in_tag' 'tag_name' %}".replace('tag_name', encodeURIComponent(input))
+        window.location.href = url // Перенаправляем на новый URL
+      }
+    })
+  </script>
+</html>
+<style>
+  .user-card {
+    width: fit-content;
+  }
+  a {
+    width: fit-content;
+  }
+  .wiget_main {
+    display: flex;
+    flex-direction: column;
+  }
+  body {
+    background-color: ghostwhite;
+  }
+  .header {
+    height: 100px;
+    background-color: steelblue;
+  }
+  /* Основное оформление контейнера */
+  .main_photos {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: lightgrey;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    width: 110vh;
+    height: 4vh;
+    margin: 0 auto 10px;
+  }
+  
+  /* Оформление блока с фотографией профиля */
+  .profile_photo {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin-right: 10px;
+    font-size: 12px;
+  }
+  
+  .profile_photo a {
+    text-decoration: none;
+    color: #007bff;
+  }
+  .profile_photo a:hover {
+    text-decoration: none;
+    color: #0056b3;
+  }
+  
+  /* Оформление блока с добавлением фотографий в галерею */
+  .galary_photos {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    padding: 10px;
+    margin-left: 10px;
+  }
+  
+  .galary_photos a {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 12px;
+  }
+  
+  .galary_photos a:hover {
+    text-decoration: none;
+    color: #0056b3;
+  }
+  @media (min-width: 600px) and (max-width: 1024px) {
+    .main_photos {
+      max-width: 80vw; /* Устанавливает максимальную ширину изображения для планшетов */
+    }
+  }
+  
+  /* Стили для изображений на мобильных устройствах */
+  @media (max-width: 599px) {
+    .main_photos {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      max-width: 80vw;
+      height: fit-content;
+    }
+  }
+</style>

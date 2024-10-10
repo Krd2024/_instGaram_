@@ -1,0 +1,6 @@
+Django
+pillow
+requests
+python-decouple
+psycopg2
+djangorestframework

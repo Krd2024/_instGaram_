@@ -1,0 +1,15 @@
+{% extends 'other/main.html' %}
+{% block content %}
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <p>
+      <label for="id_profile_picture">Фото профиля:</label>
+      <input type="file" name="profile_picture" accept="image/*" id="id_profile_picture" />
+    </p>
+    <p>
+      <label for="id_sity">Sity:</label>
+      <input type="text" name="sity" value="Краснодар" maxlength="12" id="id_sity" />
+    </p>
+    <button type="submit">Обновить</button>
+  </form>
+{% endblock %}

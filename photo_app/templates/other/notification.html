@@ -1,0 +1,57 @@
+{% extends 'other/main.html' %}
+{% block content %}
+  <div class="notifications-container">
+    {% for sender, counts in sender_counts.items %}
+      <a href="{% url 'user_profile' sender True %}">
+        <div class="notification">
+          {% comment %} <p class="notification-message">{{ notification.sender }}: Опубликовал новый пост.</p> {% endcomment %}
+          {{ sender }} опубликовал новых постов - {{ counts }}
+
+          {% comment %} <span class="notification-timestamp">{{ notification.created_at|timesince }} Просмотр</span> {% endcomment %}
+          <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+        </div>
+      </a>
+    {% empty %}
+      <p>Нет уведомлений.</p>
+    {% endfor %}
+  </div>
+  <style>
+    a {
+      text-decoration: none;
+    }
+    .notifications-container {
+      max-width: 600px; /* Максимальная ширина контейнера */
+      margin: 0 auto; /* Центрирование */
+    }
+    
+    .notification {
+      background-color: #f9f9f9; /* Цвет фона */
+      border: 1px solid #ccc; /* Граница */
+      border-radius: 5px; /* Скругление углов */
+      padding: 10px; /* Внутренние отступы */
+      margin: 10px 0; /* Внешние отступы */
+      display: flex; /* Flexbox для выравнивания */
+      justify-content: space-between; /* Пространство между элементами */
+      align-items: center; /* Вертикальное выравнивание по центру */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Тень */
+    }
+    
+    .notification-message {
+      font-size: 16px; /* Размер шрифта сообщения */
+      color: #333; /* Цвет текста */
+    }
+    
+    .notification-timestamp {
+      font-size: 12px; /* Размер шрифта времени */
+      color: #999; /* Цвет текста времени */
+    }
+    
+    .close-btn {
+      background: none; /* Без фона */
+      border: none; /* Без границы */
+      font-size: 16px; /* Размер шрифта */
+      color: #999; /* Цвет текста */
+      cursor: pointer; /* Указатель для курсора */
+    }
+  </style>
+{% endblock %}

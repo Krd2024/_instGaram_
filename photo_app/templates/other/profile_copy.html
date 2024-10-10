@@ -1,0 +1,73 @@
+{% extends 'other/main.html' %}
+{% block content %}
+  <div class="gallery-item">
+    {% for data in user %}
+      {% for post in data.post_set.all %}
+        {% if post.image.url %}
+          <div class="photo_gallery">
+            <a href=""><img src="{{ post.image.url }}" alt="{{ post.caption }}" width="200px" height="150px" class="gallery-image" /></a>
+          </div>
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  </div>
+
+  <style>
+    .photo_gallery {
+      margin: 1px;
+    }
+    .wiget_user {
+      display: flex;
+    }
+    .gallery-item {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      line-height: 0;
+    }
+    a {
+      text-decoration: none;
+    }
+    .user-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      justify-content: center;
+    }
+    
+    .user-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100px; /* Adjust size as needed */
+    }
+    
+    .user-photo {
+      width: 80px; /* Adjust size as needed */
+      height: 80px; /* Adjust size as needed */
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #ddd; /* Optional: border around the photo */
+    }
+    
+    .user-photo-placeholder {
+      width: 80px; /* Adjust size as needed */
+      height: 80px; /* Adjust size as needed */
+      border-radius: 50%;
+      background-color: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 40px; /* Adjust size as needed */
+      font-weight: bold;
+    }
+    
+    .user-name {
+      margin-top: 8px;
+      font-size: 16px;
+    }
+  </style>
+{% endblock %}

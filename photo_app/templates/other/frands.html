@@ -1,0 +1,75 @@
+{% extends 'other/main.html' %}
+{% block content %}
+  <span class="styled-span">Друзья</span>
+  <div class="wiget_user">
+    {% for user in frands %}
+      <div class="user-card">
+        {% if user.profile_picture %}
+          <div>
+            <a href="{% url 'user_profile' user.username %}"><img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="user-photo" /></a>
+          </div>
+        {% else %}
+          <div>
+            <a href="{% url 'user_profile' user.username %}"><div class="user-photo-placeholder">{{ user.username|slice:':1' }}</div></a>
+          </div>
+        {% endif %}
+        <p class="user-name">{{ user.username }}</p>
+      </div>
+    {% endfor %}
+  </div>
+  <style>
+    .styled-span {
+      margin-bottom: 10px;
+      display: inline-block;
+      padding: 4px 8px;
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+      background-color: green;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: background-color 0.3s ease;
+    }
+    .wiget_user {
+      display: flex;
+    }
+    a {
+      text-decoration: none;
+    }
+    
+    .user-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      width: 100px; /* Adjust size as needed */
+    }
+    
+    .user-photo {
+      width: 80px; /* Adjust size as needed */
+      height: 80px; /* Adjust size as needed */
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #ddd; /* Optional: border around the photo */
+    }
+    
+    .user-photo-placeholder {
+      width: 80px; /* Adjust size as needed */
+      height: 80px; /* Adjust size as needed */
+      border-radius: 50%;
+      background-color: #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 40px; /* Adjust size as needed */
+      font-weight: bold;
+    }
+    
+    .user-name {
+      margin-top: 8px;
+      font-size: 16px;
+    }
+  </style>
+{% endblock %}

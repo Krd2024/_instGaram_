@@ -1,0 +1,20 @@
+{% extends 'other/main.html' %}
+
+{% block content %}
+  {% if messages %}
+    <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  <div>Регистрация</div>
+
+  <form method="POST">
+    {% csrf_token %}
+    <input type="text" name="username" placeholder="Имя пользователя" />
+    <input type="text" name="password" placeholder="Пароль" />
+    <input type="submit" name="" id="" />
+  </form>
+{% endblock %}
