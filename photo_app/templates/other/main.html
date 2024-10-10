@@ -21,16 +21,6 @@
             </div>
           </div>
           <div>
-            <form method="get" action="{% url 'all_posts_in_tag' 'tag_name' %}">
-              <label for="tags">Теги:</label>
-              <select id="tags" name="tag">
-                {% for tag in tags %}
-                  <option value="{{ tag.name }}">{{ tag.name }}</option>
-                {% endfor %}
-              </select>
-              <button type="submit">Поиск</button>
-            </form>
-
             <div class="main_photos">
               <input type="text" id="tagInput" placeholder="Введите тег" />
               <a href="#" id="searchLink">Поиск</a>
@@ -41,7 +31,7 @@
                 <a href="{% url 'upload_photo' %}">Фото профиля</a>
               </div>
               <div class="profile_photo">
-                <a href="{% url 'upload_gallery' %}">Добавить фото</a>
+                <a href="{% url 'upload_gallery' %}">Новый пост</a>
               </div>
               <div class="profile_photo">
                 <a href="{% url 'subscriber' %}">Подписки</a>
