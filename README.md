@@ -17,7 +17,7 @@
 
 1.Склонируйте репозиторий:
    ```bash
-   git clone https://github.com/Krd2024/instaGaram.git
+   git clone https://github.com/Krd2024/_instGaram_.gi
 ```
 2.Создание виртуального окружения
 ```bash
