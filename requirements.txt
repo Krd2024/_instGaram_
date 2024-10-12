@@ -3,3 +3,5 @@ pillow
 requests
 python-decouple
 djangorestframework
+django-debug-toolbar
+redis
