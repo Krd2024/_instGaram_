@@ -4,7 +4,6 @@ from django.core.cache import cache
 
 from photo_app.models import User
 
-# Создание подключения к Redis
 redis_instance = redis.Redis(
     host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB
 )

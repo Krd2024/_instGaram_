@@ -85,7 +85,6 @@ WSGI_APPLICATION = "insta.wsgi.application"
 REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": (
         "rest_framework.renderers.JSONRenderer",
-        # другие рендереры, если есть
     ),
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
