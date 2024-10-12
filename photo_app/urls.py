@@ -3,7 +3,8 @@ from django.conf.urls.static import static
 
 from django.conf import settings
 from photo_app.auth_user import auth_login
-from serial_test import Get_cap
+
+# from serial_test import Get_cap
 
 from .views import (
     CreateUserView,
@@ -39,7 +40,7 @@ urlpatterns = [
     path("test_api/", include(router.urls)),
     path("posts/", PostListView.as_view()),
     path("api/users/create/", CreateUserView.as_view(), name="create_user"),
-    path("api/get_cap/", Get_cap.as_view(), name="get_cap"),
+    # path("api/get_cap/", Get_cap.as_view(), name="get_cap"),
     #                 -------
     path("", index, name="index"),
     path("login/", auth_login.login_view, name="login"),
