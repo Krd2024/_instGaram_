@@ -83,9 +83,7 @@ TEMPLATES = [
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 WSGI_APPLICATION = "insta.wsgi.application"
 REST_FRAMEWORK = {
-    "DEFAULT_RENDERER_CLASSES": (
-        "rest_framework.renderers.JSONRenderer",
-    ),
+    "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     "DEFAULT_PERMISSION_CLASSES": [
@@ -98,17 +96,28 @@ REST_FRAMEWORK = {
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 # Настройки кэша с использованием Redis
 
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django.core.cache.backends.redis.RedisCache",
+#         "LOCATION": "redis://127.0.0.1:6379/1",
+#     }
+# }
+
+# # Настройки для библиотеки redis-py
+# REDIS_HOST = "127.0.0.1"
+# REDIS_PORT = 6379
+# REDIS_DB = 1
+
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
+        "LOCATION": f"redis://{os.getenv('REDIS_HOST', '127.0.0.1')}:{os.getenv('REDIS_PORT', '6379')}/{os.getenv('REDIS_DB', '1')}",
     }
 }
 
-# Настройки для библиотеки redis-py
-REDIS_HOST = "127.0.0.1"
-REDIS_PORT = 6379
-REDIS_DB = 1
+REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+REDIS_DB = int(os.getenv("REDIS_DB", 1))
 
 DATABASES = {
     "default": {

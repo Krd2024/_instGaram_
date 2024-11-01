@@ -1,0 +1,26 @@
+# docker-compose.yml
+
+version: '3.10'
+networks:
+  my_network:
+    driver: bridge
+services:
+  web:
+    build: .
+    ports:
+      - "8000:8000"  # Порт, на котором будет доступен Django
+    networks:
+      - my_network
+    depends_on:
+      - redis  # Указывает, что Redis должен быть запущен перед Django
+    environment:
+      REDIS_HOST: "redis"  # Название сервиса Redis из docker-compose
+      REDIS_PORT: 6379
+      REDIS_DB: 1
+
+  redis:
+    image: redis:alpine  # Образ Redis
+    networks:
+      - my_network
+    ports:
+      - "6379:6379"  # Порт для подключения к Redis
