@@ -20,19 +20,19 @@
 
 ## Установка
 
-1.Склонируйте репозиторий:
+1. Склонируйте репозиторий:
    ```bash
 git clone https://github.com/Krd2024/_instGaram_.git
 ```
-2.Создание виртуального окружения
+2. Создание виртуального окружения
 ```bash
 python -m venv .venv
 ```
-3.Активация виртуального окружения
+3. Активация виртуального окружения
 ```bash
 .venv\Scripts\activate
 ```
-4.Установка зависимостей проекта
+4. Установка зависимостей проекта
 ```bash
 pip install -r requirements.txt
 ```
@@ -46,7 +46,7 @@ print(get_random_secret_key())
 ```python
 SECRET_KEY = см. выше
 ```
-5.Запуск
+5. Запуск
 ```bash
 python manage.py runserver
 ```
